@@ -1,5 +1,5 @@
 // --- 전역 변수 ---
-const API_BASE_URL = 'http://127.0.0.1:3000';
+const API_BASE_URL = 'https://q496qaqhdh.execute-api.ap-northeast-2.amazonaws.com';
 let currentS3Key = null;
 let currentTrimmedS3Key = null;
 let audioDuration = 0;
