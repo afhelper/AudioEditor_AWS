@@ -1,0 +1,116 @@
+/* General */
+body {
+    background-color: #f7f7f7;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#uploadArea {
+    cursor: pointer;
+}
+
+#uploadArea.active {
+    border-color: #f2711c;
+    background-color: #fff8f2;
+}
+
+#fileName {
+    font-size: 1.2em !important;
+    word-break: break-all;
+}
+
+
+/* Timeline */
+.timeline-base {
+    width: 100%;
+    height: 80px;
+    background-color: #eeeeee;
+    border-radius: 5px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    user-select: none;
+    transition: all 0.2s ease;
+}
+
+.timeline-base:hover {
+    transform: scaleY(1.05);
+}
+
+.timeline-progress {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 100%;
+    background-color: #f2711c80; /* Orange with transparency */
+    z-index: 1;
+    pointer-events: none;
+}
+
+.timeline-selection {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    background-color: #f2711c59; /* Lighter Orange with transparency */
+    z-index: 2;
+    border-left: 2px solid #f2711c;
+    border-right: 2px solid #f2711c;
+    display: none; /* Initially hidden */
+}
+
+.timeline-handle {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 10px;
+    background-color: #f2711c;
+    cursor: ew-resize;
+    z-index: 3;
+    border-radius: 3px;
+    border: 2px solid white;
+    box-shadow: 0 0 5px rgba(0,0,0,0.2);
+}
+
+.timeline-handle.start {
+    left: -6px; /* Half of width */
+}
+
+.timeline-handle.end {
+    right: -6px; /* Half of width */
+}
+
+.timeline-seek-handle {
+    position: absolute;
+    top: 0;
+    left: -2px; /* Half of width */
+    height: 100%;
+    width: 4px;
+    background-color: #d95c0d;
+    cursor: pointer;
+    z-index: 4;
+    box-shadow: 0 0 5px rgba(0,0,0,0.3);
+}
+
+.timeline-grid {
+    position: absolute;
+    inset: 0;
+    pointer-events: none;
+}
+
+.timeline-grid .grid-line {
+    position: absolute;
+    top: 0;
+    height: 100%;
+    width: 1px;
+    background-color: #0000001a;
+}
+
+.timeline-grid .time-label {
+    position: absolute;
+    bottom: -20px;
+    font-size: 0.8em;
+    color: #888;
+    transform: translateX(-50%);
+}

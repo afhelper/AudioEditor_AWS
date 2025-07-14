@@ -1,0 +1,29 @@
+# macOS
+.DS_Store
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+pip-selfcheck.json
+
+# AWS SAM
+.aws-sam/
+template.yaml
+
+# Dependencies
+python/
+requirements.txt
+
+# Application files
+main.py
+cleanup.py
+Dockerfile
+cookies.txt
+
+# Gemini CLI config
+gemini.md
