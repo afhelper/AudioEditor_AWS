@@ -718,17 +718,51 @@ async function handleYoutubeSubmit() {
 
 // --- SoundCloud 처리 ---
 async function handleSoundCloudSubmit() {
-    // NOTE: This is disabled as the backend endpoint is not implemented.
-    showStatus('SoundCloud 다운로드 기능은 현재 지원되지 않습니다.', 'warning');
-    return;
+    const urlInput = document.getElementById('soundcloudUrl');
+    const url = urlInput.value.trim();
+    const submitBtn = document.getElementById('soundcloudSubmit');
 
-    // const urlInput = document.getElementById('soundcloudUrl');
-    // const url = urlInput.value.trim();
-    // const submitBtn = document.getElementById('soundcloudSubmit');
+    if (!url) {
+        showStatus('SoundCloud URL을 입력해주세요.', 'negative');
+        return;
+    }
 
-    // if (!url) {
-    //     showStatus('SoundCloud URL을 입력해주세요.', 'negative');
-    //     return;
-    // }
-    // ... (rest of the logic would be similar to YouTube)
+    resetAll(false);
+    showStatus('SoundCloud 오디오 다운로드 중... (시간이 걸릴 수 있습니다)', 'info');
+    showProgress(25, '다운로드 시작...');
+    submitBtn.classList.add('loading', 'disabled');
+
+    try {
+        const response = await fetch(`${API_BASE_URL}/download-soundcloud/`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ url: url })
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.detail || '다운로드 실패');
+        }
+
+        const data = await response.json();
+        currentS3Key = data.s3_key;
+        audioPlayer.src = data.download_url;
+
+        showStatus('오디오 정보 로딩 중...', 'info');
+        showProgress(75, '오디오 처리 중...');
+
+        document.getElementById('fileName').textContent = data.filename;
+        document.getElementById('duration').textContent = formatTime(data.duration);
+        const format = data.filename.split('.').pop();
+        document.getElementById('format').textContent = format ? format.toUpperCase() : 'N/A';
+
+    } catch (error) {
+        showStatus('오류: ' + error.message, 'negative');
+        hideProgress();
+    } finally {
+        submitBtn.classList.remove('loading', 'disabled');
+        urlInput.value = '';
+    }
 }
