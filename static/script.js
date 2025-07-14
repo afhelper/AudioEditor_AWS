@@ -267,15 +267,46 @@ function togglePlayPause() {
     const endTime = parseFloat(endTimeInput.value);
 
     if (audioPlayer.paused) {
+        // 1. 오디오 소스가 없거나 네트워크 연결이 끊겼는지 확인
+        if (!audioPlayer.src || audioPlayer.networkState === audioPlayer.NETWORK_NO_SOURCE) {
+            showStatus('오디오 소스가 유실되었습니다. 다시 로드합니다...', 'warning');
+            // S3 키가 있다면, 새로운 Presigned URL을 요청해서 소스를 복구할 수 있음 (고급 기능)
+            // 지금은 간단히 사용자에게 알리고, 초기화하도록 유도
+            console.error("오디오 소스 없음. S3 키:", currentS3Key);
+            return;
+        }
+        
+        // 2. 재생 시작 위치 조정
         if (selection.style.display !== 'none' && (audioPlayer.currentTime < startTime || audioPlayer.currentTime >= endTime)) {
             audioPlayer.currentTime = startTime;
         }
-        audioPlayer.play().then(() => {
-            playPauseBtn.querySelector('i').className = PAUSE_ICON;
-            animationFrameId = requestAnimationFrame(updateProgressSmoothly);
-        }).catch(error => {
-            showStatus('오디오 재생 실패: ' + error.message, 'negative');
-        });
+
+        // 3. 안전하게 재생 시도
+        const playPromise = audioPlayer.play();
+        if (playPromise !== undefined) {
+            playPromise.then(() => {
+                // 성공!
+                playPauseBtn.querySelector('i').className = PAUSE_ICON;
+                animationFrameId = requestAnimationFrame(updateProgressSmoothly);
+            }).catch(error => {
+                // 실패!
+                console.error("재생 시도 실패:", error);
+                showStatus('재생에 실패했습니다. 오디오를 다시 로드합니다...', 'negative');
+                
+                // 오디오를 다시 로드해서 상태를 리셋하고, 잠시 후 다시 재생 시도
+                audioPlayer.load(); 
+                setTimeout(() => {
+                    // load() 후에 바로 play()를 호출하면 안될 수 있으므로, 약간의 딜레이를 줌
+                    audioPlayer.play().then(() => {
+                        playPauseBtn.querySelector('i').className = PAUSE_ICON;
+                        animationFrameId = requestAnimationFrame(updateProgressSmoothly);
+                    }).catch(err => {
+                        console.error("재시도 실패:", err);
+                        showStatus('재생에 최종적으로 실패했습니다. 페이지를 새로고침해주세요.', 'negative');
+                    });
+                }, 150);
+            });
+        }
     } else {
         audioPlayer.pause();
         playPauseBtn.querySelector('i').className = PLAY_ICON;
