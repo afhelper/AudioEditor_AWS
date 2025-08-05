@@ -8,8 +8,8 @@ const convertBtn = document.getElementById('convert-btn');
 const outputFormatSelect = document.getElementById('output-format');
 const bitrateSelect = document.getElementById('bitrate');
 const statusText = document.getElementById('status-text');
-const progressBarContainer = document.querySelector('.progress-bar-container');
-const progressBar = document.getElementById('progress-bar');
+const progressContainer = document.querySelector('.ui.progress');
+const progressBar = document.querySelector('.ui.progress .bar');
 const downloadLink = document.getElementById('download-link');
 
 let ffmpeg;
@@ -23,8 +23,16 @@ async function loadFFmpeg() {
             progress: ({ ratio }) => {
                 // 변환 진행률 업데이트
                 if (ratio >= 0 && ratio <= 1) {
-                    progressBar.style.width = `${ratio * 100}%`;
-                    progressBar.textContent = `${Math.round(ratio * 100)}%`;
+                    const percent = Math.round(ratio * 100);
+                    // Use Semantic UI's jQuery integration if available, otherwise fallback to manual style change
+                    if (window.jQuery) {
+                        $(progressContainer).progress({ percent: percent });
+                    } else {
+                        progressBar.style.width = `${percent}%`;
+                        if (progressBar.querySelector('.progress')) {
+                            progressBar.querySelector('.progress').textContent = `${percent}%`;
+                        }
+                    }
                 }
             },
         });
@@ -44,7 +52,11 @@ function handleFileSelect(file) {
 
     if (file && supportedExtensions.some(ext => fileName.endsWith(ext))) {
         selectedFile = file;
-        dropZone.firstElementChild.textContent = `선택된 파일: ${file.name}`;
+        // Update dropzone content
+        const dropZoneHeader = dropZone.querySelector('.ui.icon.header');
+        if(dropZoneHeader) {
+            dropZoneHeader.innerHTML = `<i class="file audio outline icon"></i> ${file.name}`;
+        }
         convertBtn.disabled = false;
         statusText.textContent = '옵션을 확인하고 변환 버튼을 누르세요.';
         downloadLink.style.display = 'none'; // 이전 다운로드 링크 숨기기
@@ -92,9 +104,15 @@ convertBtn.addEventListener('click', async () => {
     // UI 비활성화 및 상태 초기화
     convertBtn.disabled = true;
     downloadLink.style.display = 'none';
-    progressBarContainer.style.display = 'block';
-    progressBar.style.width = '0%';
-    progressBar.textContent = '0%';
+    progressContainer.style.display = 'block';
+    if (window.jQuery) {
+        $(progressContainer).progress({ percent: 0 });
+    } else {
+        progressBar.style.width = '0%';
+        if (progressBar.querySelector('.progress')) {
+            progressBar.querySelector('.progress').textContent = '0%';
+        }
+    }
     statusText.textContent = '변환 준비 중...';
 
     try {
@@ -141,16 +159,17 @@ convertBtn.addEventListener('click', async () => {
         const url = URL.createObjectURL(blob);
 
         downloadLink.href = url;
-        // 다운로드 시에는 정제된 최종 파일명을 사용
         downloadLink.download = finalDownloadName;
-        downloadLink.textContent = `다운로드: ${finalDownloadName}`;
-        downloadLink.style.display = 'block';
+        downloadLink.click(); // 자동으로 다운로드 실행
 
-        statusText.textContent = '변환 완료!';
+        statusText.textContent = '변환 완료! 다운로드가 시작됩니다.';
 
         // 가상 파일 시스템 정리
         ffmpeg.FS('unlink', internalInputName);
         ffmpeg.FS('unlink', internalOutputName);
+
+        // 잠시 후 URL 해제
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
 
     } catch (error) {
         console.error('변환 오류:', error);
@@ -158,7 +177,7 @@ convertBtn.addEventListener('click', async () => {
     } finally {
         // UI 다시 활성화
         convertBtn.disabled = false;
-        progressBarContainer.style.display = 'none';
+        progressContainer.style.display = 'none';
     }
 });
 
