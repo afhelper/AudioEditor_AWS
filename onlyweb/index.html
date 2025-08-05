@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>오디오 변환기 (Wasm)</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>오디오 변환기 (Wasm)</h1>
+        <p class="description">브라우저에서 바로 WAV 또는 OGG 파일을 M4A/MP3로 변환하세요. 서버에 파일을 업로드하지 않습니다.</p>
+
+        <div id="drop-zone">
+            <p>여기에 오디오 파일을 드래그하세요.</p>
+            <p>(wav, ogg, mp3, m4a, flac, webm)</p>
+            <p>또는</p>
+            <button id="file-input-btn">파일 선택</button>
+            <input type="file" id="file-input" accept=".wav,.ogg,.mp3,.m4a,.flac,.webm" style="display: none;">
+        </div>
+
+        <div class="options">
+            <div class="option-group">
+                <label for="output-format">출력 포맷:</label>
+                <select id="output-format">
+                    <option value="m4a">M4A (AAC)</option>
+                    <option value="mp3">MP3</option>
+                </select>
+            </div>
+            <div class="option-group">
+                <label for="bitrate">비트레이트:</label>
+                <select id="bitrate">
+                    <option value="128k">128k</option>
+                    <option value="192k">192k</option>
+                    <option value="256k">256k</option>
+                    <option value="320k" selected>320k</option>
+                </select>
+            </div>
+        </div>
+
+        <button id="convert-btn" disabled>변환하기</button>
+
+        <div id="status">
+            <p id="status-text">ffmpeg.wasm 라이브러리를 로드 중입니다... 잠시만 기다려주세요.</p>
+            <div class="progress-bar-container" style="display: none;">
+                <div id="progress-bar"></div>
+            </div>
+        </div>
+
+        <a id="download-link" style="display: none;"></a>
+    </div>
+
+    <!-- ffmpeg.wasm 라이브러리 로드 -->
+    <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
