@@ -1,107 +1,71 @@
 <!DOCTYPE html>
 <html lang="ko">
+
 <head>
-    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>오디오 변환기 (Wasm)</title>
-    <!-- Semantic UI CSS -->
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.css">
-    <style>
-        body {
-            background-color: #f7f7f7;
-            padding: 2rem;
-        }
-        .ui.container {
-            max-width: 700px !important;
-        }
-        #drop-zone {
-            cursor: pointer;
-        }
-        #status {
-            margin-top: 2rem;
-            text-align: center;
-        }
-        #download-link-container {
-            text-align: center;
-            margin-top: 1.5rem;
-        }
-        .ui.progress {
-            display: none; /* Initially hidden */
-        }
-    </style>
+    <title>.gif 오디오 변환기</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
+    <link rel="icon" href="/static/favicon.ico" type="image/x-icon">
 </head>
-<body>
-    <div class="ui container">
-        <div class="ui raised segment">
-            <h1 class="ui center aligned header">오디오 변환기</h1>
 
-            <div id="drop-zone" class="ui placeholder segment">
-                <div class="ui icon header">
-                    <i class="cloud upload icon"></i>
-                    여기에 오디오 파일을 드래그하세요
+<body>
+
+    <div class="container">
+        <div class="card">
+            <h1>
+                <img src="/static/gif.gif" alt="로고" id="logo-img">
+                <span>오디오 변환기</span>
+            </h1>
+
+            <div id="drop-zone">
+                <div id="drop-zone-content">
+                    <i class="fa-solid fa-cloud-arrow-up"></i>
+                    <span id="drop-zone-text">여기에 오디오 파일을 드래그하세요</span>
+                    <div class="separator">또는</div>
+                    <button id="file-input-btn">파일 선택</button>
                 </div>
-                <div class="ui horizontal divider">또는</div>
-                <button id="file-input-btn" class="ui basic primary button">파일 선택</button>
                 <input type="file" id="file-input" accept=".wav,.ogg,.mp3,.m4a,.flac,.webm" hidden>
             </div>
 
-            <form class="ui form">
-                <div class="two fields">
-                    <div class="field">
-                        <label>출력 포맷</label>
-                        <select id="output-format" class="ui dropdown">
-                            <option value="m4a">M4A (AAC)</option>
-                            <option value="mp3">MP3</option>
-                        </select>
-                    </div>
-                    <div class="field">
-                        <label>비트레이트</label>
-                        <select id="bitrate" class="ui dropdown">
-                            <option value="128k">128k</option>
-                            <option value="192k">192k</option>
-                            <option value="256k">256k</option>
-                            <option value="320k" selected>320k</option>
-                        </select>
-                    </div>
+            <div class="options-grid">
+                <div class="option-item">
+                    <label for="output-format">출력 포맷</label>
+                    <select id="output-format">
+                        <option value="m4a">M4A (AAC)</option>
+                        <option value="mp3">MP3</option>
+                    </select>
                 </div>
-            </form>
+                <div class="option-item">
+                    <label for="bitrate">비트레이트</label>
+                    <select id="bitrate">
+                        <option value="128k">128k</option>
+                        <option value="192k">192k</option>
+                        <option value="256k">256k</option>
+                        <option value="320k" selected>320k</option>
+                    </select>
+                </div>
+            </div>
 
-            <button id="convert-btn" class="ui fluid large basic green button" disabled>
-                <i class="sync alternate icon"></i>
-                변환하기
+            <button id="convert-btn" disabled>
+                <i class="fa-solid fa-arrows-rotate"></i>
+                <span>변환하기</span>
             </button>
 
             <div id="status">
-                <p id="status-text">ffmpeg.wasm 라이브러리를 로드 중입니다... 잠시만 기다려주세요.</p>
-                <div class="ui progress">
-                    <div class="bar" id="progress-bar">
-                        <div class="progress"></div>
-                    </div>
+                <p id="status-text">변환할 파일을 선택하세요.</p>
+                <div id="progress-container">
+                    <div id="progress-bar"></div>
                 </div>
             </div>
 
-            <div id="download-link-container">
-                <a href="#" id="download-link" class="ui huge basic purple button" style="display: none;">
-                    <i class="download icon"></i>
-                </a>
-            </div>
+            <a href="#" id="download-link" class="hidden"></a>
         </div>
     </div>
 
-    <!-- jQuery (Semantic UI dependency) -->
-    <script src="/static/jquery-3.1.1.min.js"></script>
-    <!-- Semantic UI JavaScript -->
-    <script src="https://cdn.jsdelivr.net/npm/semantic-ui@2.4.2/dist/semantic.min.js"></script>
-    <!-- ffmpeg.wasm -->
     <script src="https://unpkg.com/@ffmpeg/ffmpeg@0.11.6/dist/ffmpeg.min.js"></script>
-    <!-- Custom Script -->
     <script src="/static/script.js"></script>
-    <script>
-        // Semantic UI component initialization
-        $(document).ready(function() {
-            $('.ui.dropdown').dropdown();
-        });
-    </script>
 </body>
+
 </html>
